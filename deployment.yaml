@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+  namespace: jenkins
+
+spec:
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      containers:
+        - name: jenkins
+          image: jenkins:2.60.3
+          volumeMounts:
+            - mountPath: /var/jenkins_home
+              name: azure
+#      serviceAccountName: jenkins
+      volumes:
+        - name: azure
+          persistentVolumeClaim:
+            claimName: jenkins
