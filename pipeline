@@ -1,0 +1,19 @@
+    pipeline{
+        agent {
+            node {
+                label("docker")
+                customWorkspace "/opt/workspace"
+            }
+        }
+        stages{
+            stage("My First Pipeline"){
+                steps{
+                   sh '''
+                   echo "Hello This is my First Pipeline"
+                    touch testfile
+                    ls -lrth
+                    '''
+                }
+            }
+        }
+    }
