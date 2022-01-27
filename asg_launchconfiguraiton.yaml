@@ -1,0 +1,89 @@
+Parameters:
+  StackName:
+    Description: "Name your stack" 
+    Type: String
+    Default: ${AWS::AccountId}.StackName
+  EnvironmentName:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - uat
+      - prf
+      - ebf
+      - prod
+  MyVPC:
+    Description:  
+    Type: AWS::EC2::VPC::Id
+  PrivateSubnet1:
+    Type: <AWS::EC2::Subnet::Id
+  PrivateSubnet2:
+    Type: <AWS::EC2::Subnet::Id
+
+  AdaptiaLC:
+    Description: "Enter name of your Launch Configuration"
+    Type: String
+
+  AdaptiaWebSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: allow connections from specified CIDR ranges
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 192.168.1.1/32
+
+Mappings:
+  AWSRegionArch2AMI:
+    us-west-1:
+      HVM64: ami-31490d51
+
+Conditions:
+  isProduction: !Equals [ !Ref EnvType, prod ]
+
+Resources:
+  launchConfigName: !Ref AdaptiaLC
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      LaunchConfigurationName: !Ref AdaptiaLC
+      AssociatePublicIpAddress: false
+      IamInstanceProfile: 
+      ImageId: !FindInMap [AWSRegionArch2AMI, !Ref 'AWS::Region', HVM64]
+      EbsOptimized: true|false
+      InstanceMonitoring: true|false
+      InstanceType: !If [ isProduction, t3.large, t3.small ]
+      KernelId: 
+      KeyName: 
+      SecurityGroups:
+        - !Ref  AdaptiaWebSG
+      UserData:
+        Fn::Base64: !Sub
+          #!/bin/bash -ex # your script here
+           yum update -y
+           yum install -y httpd24 php56 mysql55-server php56-mysqlnd
+           service httpd start
+           chkconfig httpd on
+           groupadd www
+           usermod -a -G www ec2-user
+           chown -R root:www /var/www
+           chmod 2775 /var/www
+           find /var/www -type d -exec chmod 2775 {} +
+           find /var/www -type f -exec chmod 0664 {} +
+           echo "<?php phpinfo(); ?>" > /var/www/html/phpinfo.php
+
+AdeptiaASG:
+  Type: AWS::AutoScaling::AutoScalingGroup
+  Properties:
+    VPCZoneIdentifier:
+      - !Ref PrivateSubnet1
+      - !Ref PrivateSubnet2
+    LaunchConfigurationName: !Ref mySimpleConfig
+    MinSize: '0'
+    MaxSize: '1'
+    DesiredCapacity: '1'
+
