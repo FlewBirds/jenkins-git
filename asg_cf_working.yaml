@@ -1,33 +1,3 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@iam4urk 
-awslabs
-/
-aws-cloudformation-templates
-Public
-Code
-Issues
-58
-Pull requests
-55
-Actions
-Projects
-Security
-Insights
-aws-cloudformation-templates/aws/services/AutoScaling/AutoScalingRollingUpdates.yaml
-@elliotyam
-elliotyam Update AutoScalingRollingUpdates.yaml
-…
-Latest commit 016bd15 on 20 Dec 2016
- History
- 1 contributor
-454 lines (454 sloc)  11.9 KB
-   
 AWSTemplateFormatVersion: '2010-09-09'
 Metadata: 
   License: Apache-2.0
@@ -482,15 +452,3 @@ Outputs:
   URL:
     Description: URL of the website
     Value: !Join ['', ['http://', !GetAtt [ElasticLoadBalancer, DNSName]]]
-© 2022 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
